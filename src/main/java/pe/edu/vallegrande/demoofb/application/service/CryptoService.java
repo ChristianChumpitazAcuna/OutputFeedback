@@ -16,23 +16,23 @@ public class CryptoService {
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final int KEY_SIZE = 256;
     private static final int IV_SIZE = 16;
-
     private final SecretKey key;
-    private final IvParameterSpec iv;
 
     public CryptoService() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(KEY_SIZE);
         key = keyGen.generateKey();
-
-        SecureRandom random = new SecureRandom();
-        byte[] ivBytes = new byte[IV_SIZE];
-        random.nextBytes(ivBytes);
-        iv = new IvParameterSpec(ivBytes);
     }
 
     public Mono<String> encrypt(String text) {
         return Mono.fromCallable(() -> {
+
+            // Generar nuevo IV
+            SecureRandom random = new SecureRandom();
+            byte[] ivBytes = new byte[IV_SIZE];
+            random.nextBytes(ivBytes);
+            IvParameterSpec iv = new IvParameterSpec(ivBytes);
+
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, key, iv);
 
